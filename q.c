@@ -1,4 +1,4 @@
-SEAT Booking
+SEAT Booking-------------
 
 #include <iostream>
 using namespace std;
@@ -308,6 +308,49 @@ int main() {
 //    }
     cout << "Your Birthday is " << birth_year << " " << month << " " << day << endl;
     cout << "Gender: " << gender << endl;
+
+    return 0;
+}
+asenting oder disnding ode----------------------
+
+	#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+
+    cout << "Enter number of elements: ";
+    cin >> n;
+
+    int arr[n];
+
+    // Input elements
+    cout << "Enter " << n << " numbers:\n";
+    for(int i = 0; i < n; i++) {
+        cin >> arr[i];
+    }
+
+    // Ascending Order (Bubble Sort)
+    for(int i = 0; i < n - 1; i++) {
+        for(int j = 0; j < n - i - 1; j++) {
+            if(arr[j] > arr[j + 1]) {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+
+    cout << "\nAscending Order:\n";
+    for(int i = 0; i < n; i++) {
+        cout << arr[i] << " ";
+    }
+
+    // Descending Order (reverse of ascending)
+    cout << "\n\nDescending Order:\n";
+    for(int i = n - 1; i >= 0; i--) {
+        cout << arr[i] << " ";
+    }
 
     return 0;
 }
