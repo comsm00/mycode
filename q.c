@@ -167,3 +167,200 @@ if (isset($_POST['submit'])) {
 	
 	
 </html>
+			...................................................
+
+			roman......
+<!DOCTYPE HTML>
+<html>
+	<head></head>
+	<body>
+		<h2>Roman To Numerical</h2>
+		<form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+			Enter the No:
+			<input type="text" name="roman">
+			<br><br>
+			
+			<input type="submit" name="submit">
+		</form>
+		
+		<?php 
+			if($_SERVER["REQUEST_METHOD"]=="POST"){
+
+				$roman = $_POST["roman"];
+				$roman = strtoupper($roman);
+				
+				if(empty($roman)){
+					echo "Enter the currect value";
+				}
+				else{
+					$values = ["I"=>1,"V"=>5,"X"=>10,"L"=>50,"C"=>100,"D"=>500,"M"=>1000];
+				
+					$total = $values[$roman[0]];
+					
+					$i =1;
+					
+					while($i < strlen($roman)){
+						$curr = $values[$roman[$i]];
+						$prev = $values[$roman[$i-1]];
+						
+						if($curr > $prev){
+							$total = $total +  $curr - 2*$prev;
+						}
+						else{
+							$total = $total + $curr;
+						}
+						$i++;
+					}
+					
+					echo "Decimal : ".$total;
+					}
+				
+			}
+		?>
+	</body>
+</html>
+	...................................................
+			<!DOCTYPE html>
+<html>
+<head>
+    <title>Matrix Multiplication</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        td {
+            padding: 5px;
+        }
+        input[type=text], input[type=number] {
+            width: 60px;
+            padding: 5px;
+            text-align: center;
+        }
+        .matrix-title {
+            font-weight: bold;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Square Matrix Multiplication</h2>
+
+<?php
+$n = 0;
+
+if (isset($_POST['set_size'])) {
+    $n = $_POST['n'];
+}
+else if (isset($_POST['multiply'])) {
+    $n = $_POST['n'];
+}
+?>
+
+<!-- Step 1: Enter matrix size -->
+<form method="post" action="">
+    Enter size of square matrix (n):
+    <input type="number" name="n" min="1" required value="<?php echo $n; ?>">
+    <input type="submit" name="set_size" value="Create Matrices">
+</form>
+
+<?php
+if ($n > 0 && isset($_POST['set_size'])) {
+?>
+    <!-- Step 2: Enter matrix values -->
+    <form method="post" action="">
+        <input type="hidden" name="n" value="<?php echo $n; ?>">
+
+        <div class="matrix-title">Enter values for Matrix A</div>
+        <table border="1">
+            <?php
+            for ($i = 0; $i < $n; $i++) {
+                echo "<tr>";
+                for ($j = 0; $j < $n; $j++) {
+                    echo "<td><input type='text' name='A[$i][$j]' required></td>";
+                }
+                echo "</tr>";
+            }
+            ?>
+        </table>
+
+        <div class="matrix-title">Enter values for Matrix B</div>
+        <table border="1">
+            <?php
+            for ($i = 0; $i < $n; $i++) {
+                echo "<tr>";
+                for ($j = 0; $j < $n; $j++) {
+                    echo "<td><input type='text' name='B[$i][$j]' required></td>";
+                }
+                echo "</tr>";
+            }
+            ?>
+        </table>
+
+        <input type="submit" name="multiply" value="Multiply Matrices">
+    </form>
+<?php
+}
+?>
+
+<?php
+if (isset($_POST['multiply'])) {
+
+    $n = $_POST['n'];
+    $A = $_POST['A'];
+    $B = $_POST['B'];
+
+    $C = array();
+
+    // Matrix multiplication
+    for ($i = 0; $i < $n; $i++) {
+        for ($j = 0; $j < $n; $j++) {
+            $C[$i][$j] = 0;
+            for ($k = 0; $k < $n; $k++) {
+                $C[$i][$j] = $C[$i][$j] + ($A[$i][$k] * $B[$k][$j]);
+            }
+        }
+    }
+
+    echo "<h3>Matrix A</h3>";
+    echo "<table border='1'>";
+    for ($i = 0; $i < $n; $i++) {
+        echo "<tr>";
+        for ($j = 0; $j < $n; $j++) {
+            echo "<td>" . $A[$i][$j] . "</td>";
+        }
+        echo "</tr>";
+    }
+    echo "</table>";
+
+    echo "<h3>Matrix B</h3>";
+    echo "<table border='1'>";
+    for ($i = 0; $i < $n; $i++) {
+        echo "<tr>";
+        for ($j = 0; $j < $n; $j++) {
+            echo "<td>" . $B[$i][$j] . "</td>";
+        }
+        echo "</tr>";
+    }
+    echo "</table>";
+
+    echo "<h3>Multiplication Matrix C = A × B</h3>";
+    echo "<table border='1'>";
+    for ($i = 0; $i < $n; $i++) {
+        echo "<tr>";
+        for ($j = 0; $j < $n; $j++) {
+            echo "<td>" . $C[$i][$j] . "</td>";
+        }
+        echo "</tr>";
+    }
+    echo "</table>";
+}
+?>
+
+</body>
+</html>..............................
+		
