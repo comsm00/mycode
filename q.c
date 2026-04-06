@@ -527,3 +527,430 @@ public class BillingApp {
         }
     }
 }
+***************____________****************************************************
+import java.util.Scanner;
+
+class Customer {
+    private int customerId;
+    private String name;
+    private String address;
+
+    public Customer(int customerId, String name, String address) {
+        this.customerId = customerId;
+        setName(name);
+        setAddress(address);
+    }
+
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        if (name != null && !name.trim().isEmpty()) {
+            this.name = name;
+        } else {
+            this.name = "Unknown";
+        }
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        if (address != null && !address.trim().isEmpty()) {
+            this.address = address;
+        } else {
+            this.address = "No Address";
+        }
+    }
+}
+
+abstract class BankAccount {
+    private Customer customer;
+    private String accountNumber;
+    private double balance;
+
+    public BankAccount(Customer customer, String accountNumber, double balance) {
+        this.customer = customer;
+        this.accountNumber = accountNumber;
+        if (balance >= 0) {
+            this.balance = balance;
+        } else {
+            this.balance = 0;
+        }
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    protected void setBalance(double balance) {
+        this.balance = balance;
+    }
+
+    public void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+        } else {
+            System.out.println("Invalid deposit amount.");
+        }
+    }
+
+    public void withdraw(double amount) {
+        if (amount > 0 && amount <= balance) {
+            balance -= amount;
+        } else {
+            System.out.println("Invalid withdraw amount or insufficient balance.");
+        }
+    }
+
+    public abstract void displayAccountDetails();
+}
+
+class SavingsAccount extends BankAccount {
+    private final double INTEREST_RATE = 0.05;
+    private final double MIN_BALANCE = 1000;
+
+    public SavingsAccount(Customer customer, String accountNumber, double balance) {
+        super(customer, accountNumber, balance);
+    }
+
+    public void addInterest() {
+        double interest = getBalance() * INTEREST_RATE;
+        setBalance(getBalance() + interest);
+    }
+
+    @Override
+    public void withdraw(double amount) {
+        if (amount > 0 && (getBalance() - amount) >= MIN_BALANCE) {
+            setBalance(getBalance() - amount);
+        } else {
+            System.out.println("Cannot withdraw. Minimum balance of 1000 must be maintained.");
+        }
+    }
+
+    @Override
+    public void displayAccountDetails() {
+        System.out.println("\n----- Savings Account -----");
+        System.out.println("Customer ID    : " + getCustomer().getCustomerId());
+        System.out.println("Customer Name  : " + getCustomer().getName());
+        System.out.println("Address        : " + getCustomer().getAddress());
+        System.out.println("Account Number : " + getAccountNumber());
+        System.out.println("Balance        : " + getBalance());
+        System.out.println("Interest Rate  : 5%");
+    }
+}
+
+class CurrentAccount extends BankAccount {
+    private final double SERVICE_CHARGE = 500;
+
+    public CurrentAccount(Customer customer, String accountNumber, double balance) {
+        super(customer, accountNumber, balance);
+    }
+
+    public void applyServiceCharge() {
+        if (getBalance() < 500) {
+            setBalance(getBalance() - SERVICE_CHARGE);
+        }
+    }
+
+    @Override
+    public void displayAccountDetails() {
+        System.out.println("\n----- Current Account -----");
+        System.out.println("Customer ID    : " + getCustomer().getCustomerId());
+        System.out.println("Customer Name  : " + getCustomer().getName());
+        System.out.println("Address        : " + getCustomer().getAddress());
+        System.out.println("Account Number : " + getAccountNumber());
+        System.out.println("Balance        : " + getBalance());
+        System.out.println("Service Charge : 500 if balance < 500");
+    }
+}
+
+public class BankApp {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of accounts: ");
+        int n = sc.nextInt();
+        sc.nextLine();
+
+        BankAccount[] accounts = new BankAccount[n];
+
+        for (int i = 0; i < n; i++) {
+            System.out.println("\nEnter details for Account " + (i + 1));
+
+            System.out.print("Enter Customer ID: ");
+            int customerId = sc.nextInt();
+            sc.nextLine();
+
+            System.out.print("Enter Customer Name: ");
+            String name = sc.nextLine();
+
+            System.out.print("Enter Address: ");
+            String address = sc.nextLine();
+
+            Customer customer = new Customer(customerId, name, address);
+
+            System.out.print("Enter Account Number: ");
+            String accountNumber = sc.nextLine();
+
+            System.out.print("Enter Initial Balance: ");
+            double balance = sc.nextDouble();
+
+            System.out.print("Enter Account Type (1 for Savings, 2 for Current): ");
+            int choice = sc.nextInt();
+
+            if (choice == 1) {
+                accounts[i] = new SavingsAccount(customer, accountNumber, balance);
+            } else {
+                accounts[i] = new CurrentAccount(customer, accountNumber, balance);
+            }
+
+            System.out.print("Enter deposit amount: ");
+            double depositAmount = sc.nextDouble();
+            accounts[i].deposit(depositAmount);
+
+            System.out.print("Enter withdraw amount: ");
+            double withdrawAmount = sc.nextDouble();
+            accounts[i].withdraw(withdrawAmount);
+
+            if (accounts[i] instanceof SavingsAccount) {
+                ((SavingsAccount) accounts[i]).addInterest();
+            } else if (accounts[i] instanceof CurrentAccount) {
+                ((CurrentAccount) accounts[i]).applyServiceCharge();
+            }
+
+            sc.nextLine();
+        }
+
+        System.out.println("\n========== ACCOUNT DETAILS ==========");
+        for (BankAccount acc : accounts) {
+            acc.displayAccountDetails();
+        }
+
+        sc.close();
+    }
+}
+
+
+
+******************************************************************************************************8
+import java.util.Scanner;
+
+class Customer {
+    private int customerId;
+    private String name;
+    private String address;
+
+    public Customer(int customerId, String name, String address) {
+        this.customerId = customerId;
+        setName(name);
+        setAddress(address);
+    }
+
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        if (name != null && !name.trim().isEmpty()) {
+            this.name = name;
+        } else {
+            this.name = "Unknown";
+        }
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        if (address != null && !address.trim().isEmpty()) {
+            this.address = address;
+        } else {
+            this.address = "No Address";
+        }
+    }
+}
+
+abstract class UtilityAccount {
+    private Customer customer;
+    private double unitsConsumed;
+    private double billAmount;
+
+    public UtilityAccount(Customer customer, double unitsConsumed) {
+        this.customer = customer;
+        setUnitsConsumed(unitsConsumed);
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public double getUnitsConsumed() {
+        return unitsConsumed;
+    }
+
+    public void setUnitsConsumed(double unitsConsumed) {
+        if (unitsConsumed >= 0) {
+            this.unitsConsumed = unitsConsumed;
+        } else {
+            this.unitsConsumed = 0;
+        }
+    }
+
+    public double getBillAmount() {
+        return billAmount;
+    }
+
+    protected void setBillAmount(double billAmount) {
+        this.billAmount = billAmount;
+    }
+
+    public abstract void calculateBill();
+    public abstract void generateBill();
+}
+
+class ElectricityAccount extends UtilityAccount {
+    private final double RATE = 6.0;
+
+    public ElectricityAccount(Customer customer, double unitsConsumed) {
+        super(customer, unitsConsumed);
+    }
+
+    @Override
+    public void calculateBill() {
+        double amount = getUnitsConsumed() * RATE;
+
+        if (getUnitsConsumed() > 300) {
+            amount = amount + (amount * 0.10);
+        }
+
+        setBillAmount(amount);
+    }
+
+    @Override
+    public void generateBill() {
+        calculateBill();
+
+        System.out.println("\n===== Electricity Bill =====");
+        System.out.println("Customer ID   : " + getCustomer().getCustomerId());
+        System.out.println("Customer Name : " + getCustomer().getName());
+        System.out.println("Address       : " + getCustomer().getAddress());
+        System.out.println("Units Used    : " + getUnitsConsumed());
+        System.out.println("Rate per Unit : $6");
+        if (getUnitsConsumed() > 300) {
+            System.out.println("Extra Charge  : 10% surcharge applied");
+        } else {
+            System.out.println("Extra Charge  : No surcharge");
+        }
+        System.out.println("Bill Amount   : $" + getBillAmount());
+        System.out.println("============================");
+    }
+}
+
+class WaterAccount extends UtilityAccount {
+    private final double RATE = 2.0;
+
+    public WaterAccount(Customer customer, double unitsConsumed) {
+        super(customer, unitsConsumed);
+    }
+
+    @Override
+    public void calculateBill() {
+        double amount = getUnitsConsumed() * RATE;
+
+        if (getUnitsConsumed() > 500) {
+            amount = amount + 150;
+        }
+
+        setBillAmount(amount);
+    }
+
+    @Override
+    public void generateBill() {
+        calculateBill();
+
+        System.out.println("\n======= Water Bill =======");
+        System.out.println("Customer ID   : " + getCustomer().getCustomerId());
+        System.out.println("Customer Name : " + getCustomer().getName());
+        System.out.println("Address       : " + getCustomer().getAddress());
+        System.out.println("Units Used    : " + getUnitsConsumed());
+        System.out.println("Rate per Unit : $2");
+        if (getUnitsConsumed() > 500) {
+            System.out.println("Extra Charge  : $150 fixed charge applied");
+        } else {
+            System.out.println("Extra Charge  : No fixed charge");
+        }
+        System.out.println("Bill Amount   : $" + getBillAmount());
+        System.out.println("==========================");
+    }
+}
+
+public class BillingApp {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of utility accounts: ");
+        int n = sc.nextInt();
+        sc.nextLine();
+
+        UtilityAccount[] accounts = new UtilityAccount[n];
+
+        for (int i = 0; i < n; i++) {
+            System.out.println("\nEnter details for Account " + (i + 1));
+
+            System.out.print("Enter Customer ID: ");
+            int id = sc.nextInt();
+            sc.nextLine();
+
+            System.out.print("Enter Customer Name: ");
+            String name = sc.nextLine();
+
+            System.out.print("Enter Address: ");
+            String address = sc.nextLine();
+
+            Customer customer = new Customer(id, name, address);
+
+            System.out.print("Enter Utility Type (1 for Electricity, 2 for Water): ");
+            int choice = sc.nextInt();
+
+            System.out.print("Enter Units Consumed: ");
+            double units = sc.nextDouble();
+            sc.nextLine();
+
+            if (choice == 1) {
+                accounts[i] = new ElectricityAccount(customer, units);
+            } else if (choice == 2) {
+                accounts[i] = new WaterAccount(customer, units);
+            } else {
+                System.out.println("Invalid choice! Defaulting to Water Account.");
+                accounts[i] = new WaterAccount(customer, units);
+            }
+        }
+
+        System.out.println("\n\n========== GENERATED BILLS ==========");
+        for (UtilityAccount acc : accounts) {
+            acc.generateBill();
+        }
+
+        sc.close();
+    }
+}
