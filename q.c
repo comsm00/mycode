@@ -374,7 +374,156 @@ public class SeatReservation {
     }
 }
 ******************************************************************************************************************
+class Customer {
+    private int customerId;
+    private String name;
+    private String address;
+
+    public Customer(int customerId, String name, String address) {
+        this.customerId = customerId;
+        setName(name);
+        this.address = address;
+    }
+
+    // Read-only customerId
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        if (name != null && !name.trim().isEmpty()) {
+            this.name = name;
+        } else {
+            this.name = "Unknown";
+        }
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 }
-***********************************************************************************************
-	}
+
+abstract class UtilityAccount {
+    private Customer customer;
+    private double unitsConsumed;
+    private double billAmount;
+
+    public UtilityAccount(Customer customer, double unitsConsumed) {
+        this.customer = customer;
+        setUnitsConsumed(unitsConsumed);
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public double getUnitsConsumed() {
+        return unitsConsumed;
+    }
+
+    public void setUnitsConsumed(double unitsConsumed) {
+        if (unitsConsumed >= 0) {
+            this.unitsConsumed = unitsConsumed;
+        } else {
+            this.unitsConsumed = 0;
+        }
+    }
+
+    public double getBillAmount() {
+        return billAmount;
+    }
+
+    protected void setBillAmount(double billAmount) {
+        this.billAmount = billAmount;
+    }
+
+    public abstract void calculateBill();
+    public abstract void generateBill();
+}
+
+class ElectricityAccount extends UtilityAccount {
+    private final double RATE = 6.0;
+
+    public ElectricityAccount(Customer customer, double unitsConsumed) {
+        super(customer, unitsConsumed);
+    }
+
+    @Override
+    public void calculateBill() {
+        double amount = getUnitsConsumed() * RATE;
+
+        if (getUnitsConsumed() > 300) {
+            amount = amount + (amount * 0.10);
+        }
+
+        setBillAmount(amount);
+    }
+
+    @Override
+    public void generateBill() {
+        calculateBill();
+        System.out.println("----- Electricity Bill -----");
+        System.out.println("Customer ID   : " + getCustomer().getCustomerId());
+        System.out.println("Customer Name : " + getCustomer().getName());
+        System.out.println("Address       : " + getCustomer().getAddress());
+        System.out.println("Units         : " + getUnitsConsumed());
+        System.out.println("Bill Amount   : $" + getBillAmount());
+        System.out.println();
+    }
+}
+
+class WaterAccount extends UtilityAccount {
+    private final double RATE = 2.0;
+
+    public WaterAccount(Customer customer, double unitsConsumed) {
+        super(customer, unitsConsumed);
+    }
+
+    @Override
+    public void calculateBill() {
+        double amount = getUnitsConsumed() * RATE;
+
+        if (getUnitsConsumed() > 500) {
+            amount = amount + 150;
+        }
+
+        setBillAmount(amount);
+    }
+
+    @Override
+    public void generateBill() {
+        calculateBill();
+        System.out.println("------- Water Bill -------");
+        System.out.println("Customer ID   : " + getCustomer().getCustomerId());
+        System.out.println("Customer Name : " + getCustomer().getName());
+        System.out.println("Address       : " + getCustomer().getAddress());
+        System.out.println("Units         : " + getUnitsConsumed());
+        System.out.println("Bill Amount   : $" + getBillAmount());
+        System.out.println();
+    }
+}
+
+public class BillingApp {
+    public static void main(String[] args) {
+        Customer c1 = new Customer(101, "Risi", "Trincomalee");
+        Customer c2 = new Customer(102, "Ahamed", "Kinniya");
+        Customer c3 = new Customer(103, "Nizam", "Batticaloa");
+
+        UtilityAccount[] accounts = new UtilityAccount[3];
+        accounts[0] = new ElectricityAccount(c1, 350);
+        accounts[1] = new WaterAccount(c2, 600);
+        accounts[2] = new ElectricityAccount(c3, 250);
+
+        for (UtilityAccount acc : accounts) {
+            acc.generateBill();
+        }
+    }
 }
