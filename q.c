@@ -1,956 +1,152 @@
-**********************************************************************************
-class Student{
-	String name;
-	int marks;
-	
-	void displayDetails(){
-		System.out.println("Name: " + name);
-		System.out.println("Marks: " + marks);
-	}
-}
-
-public class Main{
-	public static void main(String args[]){
-		
-		Student s1 = new Student();
-		Student s2 = new Student();
-		Student s3 = new Student();
-		
-		s1.name = "Akeef";
-		s1.marks = 80;
-		
-		s2.name = "Ahmed";
-		s2.marks = 85;
-		
-		s3.name = "Mubeen";
-		s3.marks = 90;
-		
-		s1.displayDetails();
-		s2.displayDetails();
-		s3.displayDetails();
-	}
-}
-********************************************************************************
-class Car{
-	String brand;
-	String color;
-	int speed;
-	
-	void drive(){
-		speed += 10;
-		
-		System.out.println(brand + " " + "is driving. Current speed: " + speed);
-	}
-	
-	void breake(){
-		speed -= 5;
-		
-		System.out.println(brand + " " + "is breaking. Current speed: " + speed);
-		
-	}
-}
-
-public class Main1{
-	public static void main(String args[]){
-		
-		Car c1 = new Car();
-		Car c2 = new Car();
-		
-		c1.brand = "Audi";
-		c1.color = "Blue";
-		c1.speed = 120;
-		
-		c2.brand = "Benz";
-		c2.color = "Black";
-		c2.speed = 130;
-		
-		c1.drive();
-		c1.breake();
-		
-		System.out.println();
-		
-		c2.drive();
-		c2.breake();
-	}
-}
-************************************************************************************
-class Circle{
-	double radius;
-	
-	/*double getArea(){							
-		return Math.PI * radius *radius;
-	}*/
-	
-	void getArea(){
-		double area = Math.PI * radius *radius;
-		System.out.println("Area is: " + area);
-	}
-	
-	/*double getPerimeter(){
-		return 2 * Math.PI * radius;
-	}*/
-	
-	void getPerimeter(){
-		double perimeter = 2 * Math.PI * radius;
-		System.out.println("Perimeter is: " + perimeter);
-	}
-}
-
-public class Main2{
-	public static void main(String args[]){
-		
-		Circle c1 = new Circle();
-		Circle c2 = new Circle();
-		
-		c1.radius = 4;
-		c2.radius = 5;
-		
-		System.out.println("Circle 1:");
-        System.out.println("Radius: " + c1.radius);
-        c1.getArea();
-        c1.getPerimeter();
-
-        System.out.println();
-
-        
-        System.out.println("Circle 2:");
-        System.out.println("Radius: " + c2.radius);
-        c2.getArea();
-        c2.getPerimeter();
-	}
-}
-******************************************************************************************
-class BankAccount {
-    private double balance;
-
-    public void deposit(double amount) {
-        balance += amount;
+import java.awt.*;
+import javax.swing.*;
+ 
+public class Pentagon extends JPanel {
+    public void paint(Graphics g) {
+        g.setColor(Color.YELLOW);
+ 
+        // Pentagon (5 sides)
+        int[] px = {150, 230, 200, 100, 70};
+        int[] py = {30, 90, 190, 190, 90};
+ 
+        drawDDA(g, px[0], py[0], px[1], py[1]); // Side 1
+        drawDDA(g, px[1], py[1], px[2], py[2]); // Side 2
+        drawDDA(g, px[2], py[2], px[3], py[3]); // Side 3
+        drawDDA(g, px[3], py[3], px[4], py[4]); // Side 4
+        drawDDA(g, px[4], py[4], px[0], py[0]); // Side 5
     }
-
-    public double getBalance() {
-        return balance;
+ 
+    public void drawDDA(Graphics g, int x1, int y1, int x2, int y2) {
+        int dx = x2 - x1;
+        int dy = y2 - y1;
+        int steps = Math.max(Math.abs(dx), Math.abs(dy));
+        float xInc = (float) dx / steps;
+        float yInc = (float) dy / steps;
+        float x = x1;
+        float y = y1;
+        for (int i = 0; i <= steps; i++) {
+            g.fillRect(Math.round(x), Math.round(y), 2, 2);
+            x += xInc;
+            y += yInc;
+        }
     }
-}
-
-public class Main3 {
+ 
     public static void main(String[] args) {
-
-        BankAccount account = new BankAccount();
-
-        account.deposit(2000);
-		account.deposit(500);
-
-        System.out.println("Balance: " + account.getBalance());
-
+        JFrame frame = new JFrame("Pentagon using DDA");
+        Pentagon panel = new Pentagon();
+        frame.add(panel);
+        frame.setSize(350, 300);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
     }
-*******************************************************************************************
-abstract class Player {
-    int playerID;
-    String name;
-    String country;
-    int[] scores;
+} 
 
-    public Player(int playerID, String name, String country, int[] scores) {
-        this.playerID = playerID;
-        this.name = name;
-        this.country = country;
-        this.scores = scores;
-    }
 
-    public int getPlayerID() {
-        return playerID;
-    }
+******************************************************************
 
-    public String getName() {
-        return name;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    abstract void addScore(int score);
-    abstract void printDetails();
-}
-
-class Batsman extends Player {
-    int runs;
-
-    public Batsman(int playerID, String name, String country, int[] scores) {
-        super(playerID, name, country, scores);
-        calculateRuns();
-    }
-
-    private void calculateRuns() {
-        runs = 0;
-        for (int s : scores) {
-            runs += s;
+import javax.swing.*;
+import java.awt.*;
+ 
+public class BresenhamAllShapes extends JPanel {
+ 
+    // ---------- Core Bresenham line algorithm ----------
+    public void drawBresenhamLine(Graphics g, int x1, int y1, int x2, int y2) {
+        int dx = Math.abs(x2 - x1);
+        int dy = Math.abs(y2 - y1);
+        int sx = (x2 > x1) ? 1 : -1;
+        int sy = (y2 > y1) ? 1 : -1;
+ 
+        if (dx >= dy) {
+            int d = 2 * dy - dx;
+            int y = y1;
+            for (int x = x1; x != x2; x += sx) {
+                g.fillRect(x, y, 2, 2);
+                if (d > 0) { y += sy; d -= 2 * dx; }
+                d += 2 * dy;
+            }
+        } else {
+            int d = 2 * dx - dy;
+            int x = x1;
+            for (int y = y1; y != y2; y += sy) {
+                g.fillRect(x, y, 2, 2);
+                if (d > 0) { x += sx; d -= 2 * dy; }
+                d += 2 * dx;
+            }
         }
+        g.fillRect(x2, y2, 2, 2);
     }
-
-    public int getRuns() {
-        return runs;
+ 
+    public void paint(Graphics g) {
+        super.paint(g);
+ 
+        // ---------- 1) Yellow Hexagon ----------
+        g.setColor(Color.YELLOW.darker());
+        drawBresenhamLine(g, 100, 175, 150, 150);
+        drawBresenhamLine(g, 150, 150, 200, 175);
+        drawBresenhamLine(g, 200, 175, 200, 225);
+        drawBresenhamLine(g, 200, 225, 150, 250);
+        drawBresenhamLine(g, 150, 250, 100, 225);
+        drawBresenhamLine(g, 100, 225, 100, 175);
+ 
+        // ---------- 2) Orange Rectangle ----------
+        g.setColor(Color.ORANGE);
+        drawBresenhamLine(g, 250, 150, 350, 150);
+        drawBresenhamLine(g, 350, 150, 350, 200);
+        drawBresenhamLine(g, 350, 200, 250, 200);
+        drawBresenhamLine(g, 250, 200, 250, 150);
+ 
+        // ---------- 3) Purple Rhombus / Parallelogram ----------
+        g.setColor(new Color(128, 0, 128));
+        drawBresenhamLine(g, 400, 200, 430, 150);
+        drawBresenhamLine(g, 430, 150, 480, 150);
+        drawBresenhamLine(g, 480, 150, 450, 200);
+        drawBresenhamLine(g, 450, 200, 400, 200);
+ 
+        // ---------- 4) Blue Pentagon ----------
+        g.setColor(Color.BLUE);
+        drawBresenhamLine(g, 300, 275, 340, 305);
+        drawBresenhamLine(g, 340, 305, 325, 350);
+        drawBresenhamLine(g, 325, 350, 275, 350);
+        drawBresenhamLine(g, 275, 350, 260, 305);
+        drawBresenhamLine(g, 260, 305, 300, 275);
+ 
+        // ---------- 5) Red Triangle ----------
+        g.setColor(Color.RED);
+        drawBresenhamLine(g, 430, 275, 470, 350);
+        drawBresenhamLine(g, 470, 350, 390, 350);
+        drawBresenhamLine(g, 390, 350, 430, 275);
+ 
+        // ---------- 6) Green Trapezoid ----------
+        g.setColor(new Color(0, 100, 0));
+        drawBresenhamLine(g, 120, 300, 200, 300);
+        drawBresenhamLine(g, 200, 300, 180, 360);
+        drawBresenhamLine(g, 180, 360, 140, 360);
+        drawBresenhamLine(g, 140, 360, 120, 300);
+ 
+        // ---------- 7) Black Hexagon with internal triangulation ----------
+        g.setColor(Color.BLACK);
+        drawBresenhamLine(g, 500, 250, 700, 400);
+        drawBresenhamLine(g, 700, 400, 300, 400);
+        drawBresenhamLine(g, 700, 400, 700, 550);
+        drawBresenhamLine(g, 700, 550, 500, 700);
+        drawBresenhamLine(g, 700, 550, 300, 550);
+        drawBresenhamLine(g, 700, 550, 500, 250);
+        drawBresenhamLine(g, 500, 700, 500, 550);
+        drawBresenhamLine(g, 500, 700, 300, 550);
+        drawBresenhamLine(g, 500, 550, 400, 400);
+        drawBresenhamLine(g, 500, 550, 600, 400);
+        drawBresenhamLine(g, 300, 550, 300, 400);
+        drawBresenhamLine(g, 300, 550, 500, 250);
+        drawBresenhamLine(g, 300, 400, 500, 250);
     }
-
-    @Override
-    void addScore(int score) {
-        if (score >= 0 && score <= 100) {
-            int[] newScores = new int[scores.length + 1];
-            System.arraycopy(scores, 0, newScores, 0, scores.length);
-            newScores[scores.length] = score;
-            scores = newScores;
-            runs += score;
-        }
-    }
-
-    @Override
-    void printDetails() {
-        System.out.println("\nBatsman ID: " + playerID);
-        System.out.println("Name: " + name);
-        System.out.println("Country: " + country);
-        System.out.print("Scores: ");
-        for (int s : scores) System.out.print(s + " ");
-        System.out.println("\nTotal Runs: " + runs);
-    }
-}
-
-class Bowler extends Player {
-    int wickets;
-
-    public Bowler(int playerID, String name, String country, int[] scores) {
-        super(playerID, name, country, scores);
-        calculateWickets();
-    }
-
-    private void calculateWickets() {
-        wickets = 0;
-        for (int s : scores) {
-            wickets += s;
-        }
-    }
-
-    public int getWickets() {
-        return wickets;
-    }
-
-    @Override
-    void addScore(int score) {
-        if (score >= 0 && score <= 10) {
-            int[] newScores = new int[scores.length + 1];
-            System.arraycopy(scores, 0, newScores, 0, scores.length);
-            newScores[scores.length] = score;
-            scores = newScores;
-            wickets += score;
-        }
-    }
-
-    @Override
-    void printDetails() {
-        System.out.println("\nBowler ID: " + playerID);
-        System.out.println("Name: " + name);
-        System.out.println("Country: " + country);
-        System.out.print("Scores: ");
-        for (int s : scores) System.out.print(s + " ");
-        System.out.println("\nTotal Wickets: " + wickets);
-    }
-}
-
-public class CricketApp {
+ 
     public static void main(String[] args) {
-
-        // Batsmen
-        Batsman[] batsmen = {
-            new Batsman(1, "Sachin Tendulkar", "India", new int[]{42,0,61,15,0,100,23,64,41,0,26}),
-            new Batsman(2, "Virat Kohli", "India", new int[]{0,25,10,60,11,0,40,11,0,2,0}),
-            new Batsman(3, "MS Dhoni", "India", new int[]{6,22,48,0,11,69,0,21,19,0,42}),
-            new Batsman(4, "Ricky Ponting", "Australia", new int[]{11,0,28,0,64,18,45,26,0,11,0}),
-            new Batsman(5, "Brian Lara", "West Indies", new int[]{0,13,21,47,0,69,17,0,12,0,40})
-        };
-
-        // Bowlers
-        Bowler[] bowlers = {
-            new Bowler(1, "Muralitharan", "Sri Lanka", new int[]{0,10,6,8,0,1,0,2,4,0,6}),
-            new Bowler(2, "Shane Warne", "Australia", new int[]{6,0,1,0,2,0,4,10,0,6,8}),
-            new Bowler(3, "Hasaranga", "Sri Lanka", new int[]{0,1,0,6,8,4,2,0,6,0,10}),
-            new Bowler(4, "McGrath", "Australia", new int[]{4,2,6,0,10,0,1,8,6,0,0}),
-            new Bowler(5, "Dale Steyn", "South Africa", new int[]{0,4,0,2,1,6,10,0,8,6,0})
-        };
-
-        // Print all
-        for (Batsman b : batsmen) b.printDetails();
-        for (Bowler b : bowlers) b.printDetails();
-
-        // Add score 14 to Batsman 1
-        batsmen[0].addScore(14);
-
-        // Highest Runs
-        Batsman topBatsman = batsmen[0];
-        for (Batsman b : batsmen) {
-            if (b.getRuns() > topBatsman.getRuns()) {
-                topBatsman = b;
-            }
-        }
-        System.out.println("\nTop Batsman:");
-        topBatsman.printDetails();
-
-        // Highest Wickets
-        Bowler topBowler = bowlers[0];
-        for (Bowler b : bowlers) {
-            if (b.getWickets() > topBowler.getWickets()) {
-                topBowler = b;
-            }
-        }
-        System.out.println("\nTop Bowler:");
-        topBowler.printDetails();
-
-        // Players from Australia
-        System.out.println("\nPlayers from Australia:");
-        for (Batsman b : batsmen) {
-            if (b.getCountry().equals("Australia")) b.printDetails();
-        }
-        for (Bowler b : bowlers) {
-            if (b.getCountry().equals("Australia")) b.printDetails();
-        }
-    }
-}
-************************************************************************************************
-import java.util.Scanner;
-
-public class SeatReservation {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
-        int rows = 5;
-        int cols = 8;
-        String[][] seats = new String[rows][cols];
-
-        // Assign seat numbers
-        int seatNo = 1;
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                seats[i][j] = String.valueOf(seatNo++);
-            }
-        }
-
-        while (true) {
-            // Display seats
-            System.out.println("\nSeat Layout:");
-            for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < cols; j++) {
-                    System.out.print(seats[i][j] + "\t");
-                }
-                System.out.println();
-            }
-
-            System.out.print("\nEnter seat number (0 to exit): ");
-            int input = sc.nextInt();
-
-            if (input == 0) {
-                System.out.println("Exiting...");
-                break;
-            }
-
-            boolean found = false;
-
-            for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < cols; j++) {
-                    if (seats[i][j].equals(String.valueOf(input))) {
-                        seats[i][j] = "X";
-                        System.out.println("Seat successfully reserved");
-                        found = true;
-                    } else if (seats[i][j].equals("X") && input == (i * cols + j + 1)) {
-                        System.out.println("Ok (Already Reserved)");
-                        found = true;
-                    }
-                }
-            }
-
-            if (!found) {
-                System.out.println("Invalid seat number!");
-            }
-        }
-
-        sc.close();
-    }
-}
-******************************************************************************************************************
-class Customer {
-    private int customerId;
-    private String name;
-    private String address;
-
-    public Customer(int customerId, String name, String address) {
-        this.customerId = customerId;
-        setName(name);
-        this.address = address;
-    }
-
-    // Read-only customerId
-    public int getCustomerId() {
-        return customerId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        if (name != null && !name.trim().isEmpty()) {
-            this.name = name;
-        } else {
-            this.name = "Unknown";
-        }
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-}
-
-abstract class UtilityAccount {
-    private Customer customer;
-    private double unitsConsumed;
-    private double billAmount;
-
-    public UtilityAccount(Customer customer, double unitsConsumed) {
-        this.customer = customer;
-        setUnitsConsumed(unitsConsumed);
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public double getUnitsConsumed() {
-        return unitsConsumed;
-    }
-
-    public void setUnitsConsumed(double unitsConsumed) {
-        if (unitsConsumed >= 0) {
-            this.unitsConsumed = unitsConsumed;
-        } else {
-            this.unitsConsumed = 0;
-        }
-    }
-
-    public double getBillAmount() {
-        return billAmount;
-    }
-
-    protected void setBillAmount(double billAmount) {
-        this.billAmount = billAmount;
-    }
-
-    public abstract void calculateBill();
-    public abstract void generateBill();
-}
-
-class ElectricityAccount extends UtilityAccount {
-    private final double RATE = 6.0;
-
-    public ElectricityAccount(Customer customer, double unitsConsumed) {
-        super(customer, unitsConsumed);
-    }
-
-    @Override
-    public void calculateBill() {
-        double amount = getUnitsConsumed() * RATE;
-
-        if (getUnitsConsumed() > 300) {
-            amount = amount + (amount * 0.10);
-        }
-
-        setBillAmount(amount);
-    }
-
-    @Override
-    public void generateBill() {
-        calculateBill();
-        System.out.println("----- Electricity Bill -----");
-        System.out.println("Customer ID   : " + getCustomer().getCustomerId());
-        System.out.println("Customer Name : " + getCustomer().getName());
-        System.out.println("Address       : " + getCustomer().getAddress());
-        System.out.println("Units         : " + getUnitsConsumed());
-        System.out.println("Bill Amount   : $" + getBillAmount());
-        System.out.println();
-    }
-}
-
-class WaterAccount extends UtilityAccount {
-    private final double RATE = 2.0;
-
-    public WaterAccount(Customer customer, double unitsConsumed) {
-        super(customer, unitsConsumed);
-    }
-
-    @Override
-    public void calculateBill() {
-        double amount = getUnitsConsumed() * RATE;
-
-        if (getUnitsConsumed() > 500) {
-            amount = amount + 150;
-        }
-
-        setBillAmount(amount);
-    }
-
-    @Override
-    public void generateBill() {
-        calculateBill();
-        System.out.println("------- Water Bill -------");
-        System.out.println("Customer ID   : " + getCustomer().getCustomerId());
-        System.out.println("Customer Name : " + getCustomer().getName());
-        System.out.println("Address       : " + getCustomer().getAddress());
-        System.out.println("Units         : " + getUnitsConsumed());
-        System.out.println("Bill Amount   : $" + getBillAmount());
-        System.out.println();
-    }
-}
-
-public class BillingApp {
-    public static void main(String[] args) {
-        Customer c1 = new Customer(101, "Risi", "Trincomalee");
-        Customer c2 = new Customer(102, "Ahamed", "Kinniya");
-        Customer c3 = new Customer(103, "Nizam", "Batticaloa");
-
-        UtilityAccount[] accounts = new UtilityAccount[3];
-        accounts[0] = new ElectricityAccount(c1, 350);
-        accounts[1] = new WaterAccount(c2, 600);
-        accounts[2] = new ElectricityAccount(c3, 250);
-
-        for (UtilityAccount acc : accounts) {
-            acc.generateBill();
-        }
-    }
-}
-***************____________****************************************************
-import java.util.Scanner;
-
-class Customer {
-    private int customerId;
-    private String name;
-    private String address;
-
-    public Customer(int customerId, String name, String address) {
-        this.customerId = customerId;
-        setName(name);
-        setAddress(address);
-    }
-
-    public int getCustomerId() {
-        return customerId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        if (name != null && !name.trim().isEmpty()) {
-            this.name = name;
-        } else {
-            this.name = "Unknown";
-        }
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        if (address != null && !address.trim().isEmpty()) {
-            this.address = address;
-        } else {
-            this.address = "No Address";
-        }
-    }
-}
-
-abstract class BankAccount {
-    private Customer customer;
-    private String accountNumber;
-    private double balance;
-
-    public BankAccount(Customer customer, String accountNumber, double balance) {
-        this.customer = customer;
-        this.accountNumber = accountNumber;
-        if (balance >= 0) {
-            this.balance = balance;
-        } else {
-            this.balance = 0;
-        }
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public String getAccountNumber() {
-        return accountNumber;
-    }
-
-    public double getBalance() {
-        return balance;
-    }
-
-    protected void setBalance(double balance) {
-        this.balance = balance;
-    }
-
-    public void deposit(double amount) {
-        if (amount > 0) {
-            balance += amount;
-        } else {
-            System.out.println("Invalid deposit amount.");
-        }
-    }
-
-    public void withdraw(double amount) {
-        if (amount > 0 && amount <= balance) {
-            balance -= amount;
-        } else {
-            System.out.println("Invalid withdraw amount or insufficient balance.");
-        }
-    }
-
-    public abstract void displayAccountDetails();
-}
-
-class SavingsAccount extends BankAccount {
-    private final double INTEREST_RATE = 0.05;
-    private final double MIN_BALANCE = 1000;
-
-    public SavingsAccount(Customer customer, String accountNumber, double balance) {
-        super(customer, accountNumber, balance);
-    }
-
-    public void addInterest() {
-        double interest = getBalance() * INTEREST_RATE;
-        setBalance(getBalance() + interest);
-    }
-
-    @Override
-    public void withdraw(double amount) {
-        if (amount > 0 && (getBalance() - amount) >= MIN_BALANCE) {
-            setBalance(getBalance() - amount);
-        } else {
-            System.out.println("Cannot withdraw. Minimum balance of 1000 must be maintained.");
-        }
-    }
-
-    @Override
-    public void displayAccountDetails() {
-        System.out.println("\n----- Savings Account -----");
-        System.out.println("Customer ID    : " + getCustomer().getCustomerId());
-        System.out.println("Customer Name  : " + getCustomer().getName());
-        System.out.println("Address        : " + getCustomer().getAddress());
-        System.out.println("Account Number : " + getAccountNumber());
-        System.out.println("Balance        : " + getBalance());
-        System.out.println("Interest Rate  : 5%");
-    }
-}
-
-class CurrentAccount extends BankAccount {
-    private final double SERVICE_CHARGE = 500;
-
-    public CurrentAccount(Customer customer, String accountNumber, double balance) {
-        super(customer, accountNumber, balance);
-    }
-
-    public void applyServiceCharge() {
-        if (getBalance() < 500) {
-            setBalance(getBalance() - SERVICE_CHARGE);
-        }
-    }
-
-    @Override
-    public void displayAccountDetails() {
-        System.out.println("\n----- Current Account -----");
-        System.out.println("Customer ID    : " + getCustomer().getCustomerId());
-        System.out.println("Customer Name  : " + getCustomer().getName());
-        System.out.println("Address        : " + getCustomer().getAddress());
-        System.out.println("Account Number : " + getAccountNumber());
-        System.out.println("Balance        : " + getBalance());
-        System.out.println("Service Charge : 500 if balance < 500");
-    }
-}
-
-public class BankApp {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
-        System.out.print("Enter number of accounts: ");
-        int n = sc.nextInt();
-        sc.nextLine();
-
-        BankAccount[] accounts = new BankAccount[n];
-
-        for (int i = 0; i < n; i++) {
-            System.out.println("\nEnter details for Account " + (i + 1));
-
-            System.out.print("Enter Customer ID: ");
-            int customerId = sc.nextInt();
-            sc.nextLine();
-
-            System.out.print("Enter Customer Name: ");
-            String name = sc.nextLine();
-
-            System.out.print("Enter Address: ");
-            String address = sc.nextLine();
-
-            Customer customer = new Customer(customerId, name, address);
-
-            System.out.print("Enter Account Number: ");
-            String accountNumber = sc.nextLine();
-
-            System.out.print("Enter Initial Balance: ");
-            double balance = sc.nextDouble();
-
-            System.out.print("Enter Account Type (1 for Savings, 2 for Current): ");
-            int choice = sc.nextInt();
-
-            if (choice == 1) {
-                accounts[i] = new SavingsAccount(customer, accountNumber, balance);
-            } else {
-                accounts[i] = new CurrentAccount(customer, accountNumber, balance);
-            }
-
-            System.out.print("Enter deposit amount: ");
-            double depositAmount = sc.nextDouble();
-            accounts[i].deposit(depositAmount);
-
-            System.out.print("Enter withdraw amount: ");
-            double withdrawAmount = sc.nextDouble();
-            accounts[i].withdraw(withdrawAmount);
-
-            if (accounts[i] instanceof SavingsAccount) {
-                ((SavingsAccount) accounts[i]).addInterest();
-            } else if (accounts[i] instanceof CurrentAccount) {
-                ((CurrentAccount) accounts[i]).applyServiceCharge();
-            }
-
-            sc.nextLine();
-        }
-
-        System.out.println("\n========== ACCOUNT DETAILS ==========");
-        for (BankAccount acc : accounts) {
-            acc.displayAccountDetails();
-        }
-
-        sc.close();
-    }
-}
-
-
-
-******************************************************************************************************8
-import java.util.Scanner;
-
-class Customer {
-    private int customerId;
-    private String name;
-    private String address;
-
-    public Customer(int customerId, String name, String address) {
-        this.customerId = customerId;
-        setName(name);
-        setAddress(address);
-    }
-
-    public int getCustomerId() {
-        return customerId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        if (name != null && !name.trim().isEmpty()) {
-            this.name = name;
-        } else {
-            this.name = "Unknown";
-        }
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        if (address != null && !address.trim().isEmpty()) {
-            this.address = address;
-        } else {
-            this.address = "No Address";
-        }
-    }
-}
-
-abstract class UtilityAccount {
-    private Customer customer;
-    private double unitsConsumed;
-    private double billAmount;
-
-    public UtilityAccount(Customer customer, double unitsConsumed) {
-        this.customer = customer;
-        setUnitsConsumed(unitsConsumed);
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public double getUnitsConsumed() {
-        return unitsConsumed;
-    }
-
-    public void setUnitsConsumed(double unitsConsumed) {
-        if (unitsConsumed >= 0) {
-            this.unitsConsumed = unitsConsumed;
-        } else {
-            this.unitsConsumed = 0;
-        }
-    }
-
-    public double getBillAmount() {
-        return billAmount;
-    }
-
-    protected void setBillAmount(double billAmount) {
-        this.billAmount = billAmount;
-    }
-
-    public abstract void calculateBill();
-    public abstract void generateBill();
-}
-
-class ElectricityAccount extends UtilityAccount {
-    private final double RATE = 6.0;
-
-    public ElectricityAccount(Customer customer, double unitsConsumed) {
-        super(customer, unitsConsumed);
-    }
-
-    @Override
-    public void calculateBill() {
-        double amount = getUnitsConsumed() * RATE;
-
-        if (getUnitsConsumed() > 300) {
-            amount = amount + (amount * 0.10);
-        }
-
-        setBillAmount(amount);
-    }
-
-    @Override
-    public void generateBill() {
-        calculateBill();
-
-        System.out.println("\n===== Electricity Bill =====");
-        System.out.println("Customer ID   : " + getCustomer().getCustomerId());
-        System.out.println("Customer Name : " + getCustomer().getName());
-        System.out.println("Address       : " + getCustomer().getAddress());
-        System.out.println("Units Used    : " + getUnitsConsumed());
-        System.out.println("Rate per Unit : $6");
-        if (getUnitsConsumed() > 300) {
-            System.out.println("Extra Charge  : 10% surcharge applied");
-        } else {
-            System.out.println("Extra Charge  : No surcharge");
-        }
-        System.out.println("Bill Amount   : $" + getBillAmount());
-        System.out.println("============================");
-    }
-}
-
-class WaterAccount extends UtilityAccount {
-    private final double RATE = 2.0;
-
-    public WaterAccount(Customer customer, double unitsConsumed) {
-        super(customer, unitsConsumed);
-    }
-
-    @Override
-    public void calculateBill() {
-        double amount = getUnitsConsumed() * RATE;
-
-        if (getUnitsConsumed() > 500) {
-            amount = amount + 150;
-        }
-
-        setBillAmount(amount);
-    }
-
-    @Override
-    public void generateBill() {
-        calculateBill();
-
-        System.out.println("\n======= Water Bill =======");
-        System.out.println("Customer ID   : " + getCustomer().getCustomerId());
-        System.out.println("Customer Name : " + getCustomer().getName());
-        System.out.println("Address       : " + getCustomer().getAddress());
-        System.out.println("Units Used    : " + getUnitsConsumed());
-        System.out.println("Rate per Unit : $2");
-        if (getUnitsConsumed() > 500) {
-            System.out.println("Extra Charge  : $150 fixed charge applied");
-        } else {
-            System.out.println("Extra Charge  : No fixed charge");
-        }
-        System.out.println("Bill Amount   : $" + getBillAmount());
-        System.out.println("==========================");
-    }
-}
-
-public class BillingApp {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
-        System.out.print("Enter number of utility accounts: ");
-        int n = sc.nextInt();
-        sc.nextLine();
-
-        UtilityAccount[] accounts = new UtilityAccount[n];
-
-        for (int i = 0; i < n; i++) {
-            System.out.println("\nEnter details for Account " + (i + 1));
-
-            System.out.print("Enter Customer ID: ");
-            int id = sc.nextInt();
-            sc.nextLine();
-
-            System.out.print("Enter Customer Name: ");
-            String name = sc.nextLine();
-
-            System.out.print("Enter Address: ");
-            String address = sc.nextLine();
-
-            Customer customer = new Customer(id, name, address);
-
-            System.out.print("Enter Utility Type (1 for Electricity, 2 for Water): ");
-            int choice = sc.nextInt();
-
-            System.out.print("Enter Units Consumed: ");
-            double units = sc.nextDouble();
-            sc.nextLine();
-
-            if (choice == 1) {
-                accounts[i] = new ElectricityAccount(customer, units);
-            } else if (choice == 2) {
-                accounts[i] = new WaterAccount(customer, units);
-            } else {
-                System.out.println("Invalid choice! Defaulting to Water Account.");
-                accounts[i] = new WaterAccount(customer, units);
-            }
-        }
-
-        System.out.println("\n\n========== GENERATED BILLS ==========");
-        for (UtilityAccount acc : accounts) {
-            acc.generateBill();
-        }
-
-        sc.close();
+        JFrame frame = new JFrame("Bresenham Line Drawing - All Shapes");
+        BresenhamAllShapes panel = new BresenhamAllShapes();
+        panel.setBackground(Color.WHITE);
+        frame.add(panel);
+        frame.setSize(900, 800);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
     }
 }
