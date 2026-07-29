@@ -150,3 +150,41 @@ public class BresenhamAllShapes extends JPanel {
         frame.setVisible(true);
     }
 }
+ ************************************************************************
+
+ import java.awt.*;
+import javax.swing.*;
+public class Pentagon extends JPanel {
+    public void paint(Graphics g) {
+        g.setColor(Color.RED);
+
+        // Pentagon (5 sides)
+        drawDDA(g, 200, 50, 350, 50);   // Side 1
+       drawDDA(g, 350, 50, 350, 100);  // Side 2
+        drawDDA(g, 200, 100, 350, 100);  // Side 3
+        drawDDA(g, 200, 50, 200, 100);  // Side 4
+        drawDDA(g, 200, 50, 200, 500);   // Side 5
+    }
+    public void drawDDA(Graphics g, int x1, int y1, int x2, int y2) {
+        int dx = x2 - x1;
+        int dy = y2 - y1;
+        int steps = Math.max(Math.abs(dx), Math.abs(dy));
+        float xInc = (float) dx / steps;
+        float yInc = (float) dy / steps;
+        float x = x1;
+        float y = y1;
+        for (int i = 0; i <= steps; i++) {
+            g.fillRect(Math.round(x), Math.round(y), 2, 2);
+            x += xInc;
+            y += yInc;
+        }
+    }
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Pentagon using DDA");
+        Pentagon panel = new Pentagon();
+        frame.add(panel);
+        frame.setSize(450, 350);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+}
