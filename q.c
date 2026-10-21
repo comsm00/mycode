@@ -1,190 +1,312 @@
-import java.awt.*;
 import javax.swing.*;
- 
-public class Pentagon extends JPanel {
-    public void paint(Graphics g) {
-        g.setColor(Color.YELLOW);
- 
-        // Pentagon (5 sides)
-        int[] px = {150, 230, 200, 100, 70};
-        int[] py = {30, 90, 190, 190, 90};
- 
-        drawDDA(g, px[0], py[0], px[1], py[1]); // Side 1
-        drawDDA(g, px[1], py[1], px[2], py[2]); // Side 2
-        drawDDA(g, px[2], py[2], px[3], py[3]); // Side 3
-        drawDDA(g, px[3], py[3], px[4], py[4]); // Side 4
-        drawDDA(g, px[4], py[4], px[0], py[0]); // Side 5
-    }
- 
-    public void drawDDA(Graphics g, int x1, int y1, int x2, int y2) {
-        int dx = x2 - x1;
-        int dy = y2 - y1;
+import java.awt.*;
+
+public class HouseTransformation extends JPanel {
+
+    // DDA Line Drawing Algorithm
+    public void dda(Graphics g, int x0, int y0,
+                    int x1, int y1) {
+
+        int dx = x1 - x0;
+        int dy = y1 - y0;
+
         int steps = Math.max(Math.abs(dx), Math.abs(dy));
+
+        if (steps == 0) {
+            g.fillRect(x0, y0, 1, 1);
+            return;
+        }
+
         float xInc = (float) dx / steps;
         float yInc = (float) dy / steps;
-        float x = x1;
-        float y = y1;
+
+        float x = x0;
+        float y = y0;
+
         for (int i = 0; i <= steps; i++) {
-            g.fillRect(Math.round(x), Math.round(y), 2, 2);
+            g.fillRect(Math.round(x), Math.round(y), 1, 1);
             x += xInc;
             y += yInc;
         }
     }
- 
+
+    // Translation
+    public void translate(int[][] xy, int tx, int ty) {
+
+        for (int i = 0; i < xy.length; i++) {
+            xy[i][0] += tx;
+            xy[i][1] += ty;
+        }
+    }
+
+    // Scaling
+    public void scale(int[][] xy, double sx, double sy) {
+
+        for (int i = 0; i < xy.length; i++) {
+            xy[i][0] = (int) Math.round(xy[i][0] * sx);
+            xy[i][1] = (int) Math.round(xy[i][1] * sy);
+        }
+    }
+
+    // Rotation
+    public void rotate(int[][] xy, double angle) {
+
+        double rad = Math.toRadians(angle);
+
+        for (int i = 0; i < xy.length; i++) {
+
+            int x = xy[i][0];
+            int y = xy[i][1];
+
+            xy[i][0] = (int) Math.round(
+                x * Math.cos(rad) - y * Math.sin(rad));
+
+            xy[i][1] = (int) Math.round(
+                x * Math.sin(rad) + y * Math.cos(rad));
+        }
+    }
+
+    // Draw Lines using DDA
+    public void drawLines(Graphics g, int[][] xy) {
+
+        for (int i = 0; i < xy.length - 1; i++) {
+
+            dda(g, xy[i][0], xy[i][1],
+                   xy[i + 1][0], xy[i + 1][1]);
+        }
+    }
+
+    // Copy Coordinates
+    public int[][] copyPoints(int[][] xy) {
+
+        int[][] copy = new int[xy.length][2];
+
+        for (int i = 0; i < xy.length; i++) {
+            copy[i][0] = xy[i][0];
+            copy[i][1] = xy[i][1];
+        }
+
+        return copy;
+    }
+
+    // Transform and Draw One House
+    public void drawHouse(Graphics g,
+                          int[][] body,
+                          int[][] roof,
+                          int[][] door,
+                          int angle,
+                          int tx, int ty,
+                          Color color) {
+
+        int[][] b = copyPoints(body);
+        int[][] r = copyPoints(roof);
+        int[][] d = copyPoints(door);
+
+        // Scale 0.6
+        scale(b, 0.6, 0.6);
+        scale(r, 0.6, 0.6);
+        scale(d, 0.6, 0.6);
+
+        // Rotation
+        rotate(b, angle);
+        rotate(r, angle);
+        rotate(d, angle);
+
+        // Translation
+        translate(b, tx, ty);
+        translate(r, tx, ty);
+        translate(d, tx, ty);
+
+        // Draw House
+        g.setColor(color);
+
+        drawLines(g, b);
+        drawLines(g, r);
+        drawLines(g, d);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        // Original House Coordinates (Given)
+
+        // Body
+        int[][] body = {
+            {-100, 100},
+            {100, 100},
+            {100, 300},
+            {-100, 300},
+            {-100, 100}
+        };
+
+        // Roof
+        int[][] roof = {
+            {-100, 100},
+            {0, 0},
+            {100, 100},
+            {-100, 100}
+        };
+
+        // Door
+        int[][] door = {
+            {-30, 300},
+            {30, 300},
+            {30, 220},
+            {-30, 220},
+            {-30, 300}
+        };
+
+        // Top House - 0 Degree
+        drawHouse(g, body, roof, door,
+                  0, 400, 40, Color.RED);
+
+        // Right House - 90 Degree Clockwise
+        drawHouse(g, body, roof, door,
+                  90, 650, 350, Color.GREEN);
+
+        // Bottom House - 180 Degree
+        drawHouse(g, body, roof, door,
+                  180, 400, 650, Color.ORANGE);
+
+        // Left House - 270 Degree Clockwise
+        drawHouse(g, body, roof, door,
+                  270, 150, 350, Color.MAGENTA);
+    }
+
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Pentagon using DDA");
-        Pentagon panel = new Pentagon();
-        frame.add(panel);
-        frame.setSize(350, 300);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JFrame frame =
+            new JFrame("House Transformation");
+
+        frame.add(new HouseTransformation());
+
+        frame.setSize(800, 740);
+
+        frame.setDefaultCloseOperation(
+            JFrame.EXIT_ON_CLOSE);
+
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
-} 
+ }
 
 
-******************************************************************
+ ******-------******-----****-----******-----***
 
-import javax.swing.*;
-import java.awt.*;
  
-public class BresenhamAllShapes extends JPanel {
+ public void dda(Graphics g, int x0, int y0, int x1, int y1) {
+    int dx = x1 - x0;
+    int dy = y1 - y0;
+    
+    // Find the number of steps required
+    int steps = Math.max(Math.abs(dx), Math.abs(dy));
+    
+    // Calculate increment in x and y for each step
+    float xInc = dx / (float) steps;
+    float yInc = dy / (float) steps;
+    
+    float x = x0;
+    float y = y0;
+    
+    for (int i = 0; i <= steps; i++) {
+        // Draw the pixel (using a small rectangle or fillRect)
+        g.fillRect(Math.round(x), Math.round(y), 1, 1);
+        x += xInc;
+        y += yInc;
+    }
+ }
+
+ .........................
  
-    // ---------- Core Bresenham line algorithm ----------
-    public void drawBresenhamLine(Graphics g, int x1, int y1, int x2, int y2) {
-        int dx = Math.abs(x2 - x1);
-        int dy = Math.abs(y2 - y1);
-        int sx = (x2 > x1) ? 1 : -1;
-        int sy = (y2 > y1) ? 1 : -1;
- 
-        if (dx >= dy) {
-            int d = 2 * dy - dx;
-            int y = y1;
-            for (int x = x1; x != x2; x += sx) {
-                g.fillRect(x, y, 2, 2);
-                if (d > 0) { y += sy; d -= 2 * dx; }
-                d += 2 * dy;
-            }
+ public void BreCir(Graphics g, int xc, int yc, int r) {
+    int x = 0;
+    int y = r;
+    int p = 1 - r; // Initial decision parameter
+
+    drawSymmetricPoints(g, xc, yc, x, y);
+
+    while (x < y) {
+        x++;
+        if (p < 0) {
+            p += 2 * x + 1;
         } else {
-            int d = 2 * dx - dy;
-            int x = x1;
-            for (int y = y1; y != y2; y += sy) {
-                g.fillRect(x, y, 2, 2);
-                if (d > 0) { x += sx; d -= 2 * dy; }
-                d += 2 * dx;
-            }
+            y--;
+            p += 2 * (x - y) + 1;
         }
-        g.fillRect(x2, y2, 2, 2);
-    }
- 
-    public void paint(Graphics g) {
-        super.paint(g);
- 
-        // ---------- 1) Yellow Hexagon ----------
-        g.setColor(Color.YELLOW.darker());
-        drawBresenhamLine(g, 100, 175, 150, 150);
-        drawBresenhamLine(g, 150, 150, 200, 175);
-        drawBresenhamLine(g, 200, 175, 200, 225);
-        drawBresenhamLine(g, 200, 225, 150, 250);
-        drawBresenhamLine(g, 150, 250, 100, 225);
-        drawBresenhamLine(g, 100, 225, 100, 175);
- 
-        // ---------- 2) Orange Rectangle ----------
-        g.setColor(Color.ORANGE);
-        drawBresenhamLine(g, 250, 150, 350, 150);
-        drawBresenhamLine(g, 350, 150, 350, 200);
-        drawBresenhamLine(g, 350, 200, 250, 200);
-        drawBresenhamLine(g, 250, 200, 250, 150);
- 
-        // ---------- 3) Purple Rhombus / Parallelogram ----------
-        g.setColor(new Color(128, 0, 128));
-        drawBresenhamLine(g, 400, 200, 430, 150);
-        drawBresenhamLine(g, 430, 150, 480, 150);
-        drawBresenhamLine(g, 480, 150, 450, 200);
-        drawBresenhamLine(g, 450, 200, 400, 200);
- 
-        // ---------- 4) Blue Pentagon ----------
-        g.setColor(Color.BLUE);
-        drawBresenhamLine(g, 300, 275, 340, 305);
-        drawBresenhamLine(g, 340, 305, 325, 350);
-        drawBresenhamLine(g, 325, 350, 275, 350);
-        drawBresenhamLine(g, 275, 350, 260, 305);
-        drawBresenhamLine(g, 260, 305, 300, 275);
- 
-        // ---------- 5) Red Triangle ----------
-        g.setColor(Color.RED);
-        drawBresenhamLine(g, 430, 275, 470, 350);
-        drawBresenhamLine(g, 470, 350, 390, 350);
-        drawBresenhamLine(g, 390, 350, 430, 275);
- 
-        // ---------- 6) Green Trapezoid ----------
-        g.setColor(new Color(0, 100, 0));
-        drawBresenhamLine(g, 120, 300, 200, 300);
-        drawBresenhamLine(g, 200, 300, 180, 360);
-        drawBresenhamLine(g, 180, 360, 140, 360);
-        drawBresenhamLine(g, 140, 360, 120, 300);
- 
-        // ---------- 7) Black Hexagon with internal triangulation ----------
-        g.setColor(Color.BLACK);
-        drawBresenhamLine(g, 500, 250, 700, 400);
-        drawBresenhamLine(g, 700, 400, 300, 400);
-        drawBresenhamLine(g, 700, 400, 700, 550);
-        drawBresenhamLine(g, 700, 550, 500, 700);
-        drawBresenhamLine(g, 700, 550, 300, 550);
-        drawBresenhamLine(g, 700, 550, 500, 250);
-        drawBresenhamLine(g, 500, 700, 500, 550);
-        drawBresenhamLine(g, 500, 700, 300, 550);
-        drawBresenhamLine(g, 500, 550, 400, 400);
-        drawBresenhamLine(g, 500, 550, 600, 400);
-        drawBresenhamLine(g, 300, 550, 300, 400);
-        drawBresenhamLine(g, 300, 550, 500, 250);
-        drawBresenhamLine(g, 300, 400, 500, 250);
-    }
- 
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("Bresenham Line Drawing - All Shapes");
-        BresenhamAllShapes panel = new BresenhamAllShapes();
-        panel.setBackground(Color.WHITE);
-        frame.add(panel);
-        frame.setSize(900, 800);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+        drawSymmetricPoints(g, xc, yc, x, y);
     }
 }
- ************************************************************************
 
- import java.awt.*;
-import javax.swing.*;
-public class Pentagon extends JPanel {
-    public void paint(Graphics g) {
-        g.setColor(Color.RED);
+// Helper method to plot points in all 8 octants
+private void drawSymmetricPoints(Graphics g, int xc, int yc, int x, int y) {
+    g.fillRect(xc + x, yc + y, 1, 1);
+    g.fillRect(xc - x, yc + y, 1, 1);
+    g.fillRect(xc + x, yc - y, 1, 1);
+    g.fillRect(xc - x, yc - y, 1, 1);
+    g.fillRect(xc + y, yc + x, 1, 1);
+    g.fillRect(xc - y, yc + x, 1, 1);
+    g.fillRect(xc + y, yc - x, 1, 1);
+    g.fillRect(xc - y, yc - x, 1, 1);
+ }
 
-        // Pentagon (5 sides)
-        drawDDA(g, 200, 50, 350, 50);   // Side 1
-       drawDDA(g, 350, 50, 350, 100);  // Side 2
-        drawDDA(g, 200, 100, 350, 100);  // Side 3
-        drawDDA(g, 200, 50, 200, 100);  // Side 4
-        drawDDA(g, 200, 50, 200, 500);   // Side 5
+ .......................
+
+ public void translate(int[][] xy, int tx, int ty) {
+    // xy is a 2D array where each row represents a point/vertex [x, y]
+    for (int i = 0; i < xy.length; i++) {
+        xy[i][0] += tx; // Translate x coordinate
+        xy[i][1] += ty; // Translate y coordinate
     }
-    public void drawDDA(Graphics g, int x1, int y1, int x2, int y2) {
-        int dx = x2 - x1;
-        int dy = y2 - y1;
-        int steps = Math.max(Math.abs(dx), Math.abs(dy));
-        float xInc = (float) dx / steps;
-        float yInc = (float) dy / steps;
-        float x = x1;
-        float y = y1;
-        for (int i = 0; i <= steps; i++) {
-            g.fillRect(Math.round(x), Math.round(y), 2, 2);
-            x += xInc;
-            y += yInc;
-        }
+ }
+......................
+public void scale(int[][] xy, int sx, int sy) {
+    // Multiplying each vertex coordinate (x, y) by scaling factors sx and sy
+    for (int i = 0; i < xy.length; i++) {
+        xy[i][0] = (int) Math.round(xy[i][0] * sx);
+        xy[i][1] = (int) Math.round(xy[i][1] * sy);
     }
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("Pentagon using DDA");
-        Pentagon panel = new Pentagon();
-        frame.add(panel);
-        frame.setSize(450, 350);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+ }
+.....................
+ public void rotate(int[][] xy, double angle) {
+    // Convert angle from degrees to radians
+    double radians = Math.toRadians(angle);
+    double cos = Math.cos(radians);
+    double sin = Math.sin(radians);
+
+    for (int i = 0; i < xy.length; i++) {
+        double x = xy[i][0];
+        double y = xy[i][1];
+        
+        // Rotation about the origin formulas:
+        // x' = x * cos(theta) - y * sin(theta)
+        // y' = x * sin(theta) + y * cos(theta)
+        xy[i][0] = (int) Math.round(x * cos - y * sin);
+        xy[i][1] = (int) Math.round(x * sin + y * cos);
     }
-}
+ }
+.........................
+ public void rotate(Graphics g, float a[][2], int n, int x_pivot, int y_pivot, int angle)[span_5](start_span)[span_5](end_span) {
+    double rad = Math.toRadians(angle);
+    double cos = Math.cos(rad);
+    double sin = Math.sin(rad);
+    
+    int[] rotX = new int[n];
+    int[] rotY = new int[n];
+    
+    for (int i = 0; i < n; i++) {
+        float x = a[i][0];
+        float y = a[i][1];
+        
+        // Translate to origin, rotate, then translate back
+        double x_prime = x_pivot + (x - x_pivot) * cos - (y - y_pivot) * sin;
+        double y_prime = y_pivot + (x - x_pivot) * sin + (y - y_pivot) * cos;
+        
+        rotX[i] = (int) Math.round(x_prime);
+        rotY[i] = (int) Math.round(y_prime);
+    }
+    
+    g.drawPolygon(rotX, rotY, n);
+ }
+ 
+ 
