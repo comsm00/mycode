@@ -1,124 +1,130 @@
  -- Q1 (i)
-CREATE DATABASE IF NOT EXISTS insurance_db;
-USE insurance_db;
-
--- Q1 (ii)
-CREATE TABLE PERSON (
-    driver_id VARCHAR(20) PRIMARY KEY,
-    name VARCHAR(50),
-    address VARCHAR(100)
-);
-
-CREATE TABLE CAR (
-    regno VARCHAR(20) PRIMARY KEY,
-    model VARCHAR(50),
-    year DATE
-);
-
-CREATE TABLE ACCIDENT (
-    report_number INT PRIMARY KEY,
-    accdate DATE,
-    location VARCHAR(50)
-);
-
-CREATE TABLE OWNS (
-    driver_id VARCHAR(20),
-    regno VARCHAR(20),
-    PRIMARY KEY (driver_id, regno)
-);
-
-CREATE TABLE PARTICIPATED (
-    driver_id VARCHAR(20),
-    regno VARCHAR(20),
-    report_number INT,
-    damage_amount INT,
-    PRIMARY KEY (driver_id, regno, report_number)
-);
+CREATE DATABASE hospital_db;
 
 -- Q1 (iii)
-ALTER TABLE OWNS
-ADD FOREIGN KEY (driver_id)
-REFERENCES PERSON(driver_id);
+USE hospital_db;
+.........
+ CREATE TABLE PATIENT (
+    patientno INT PRIMARY KEY,
+    pname VARCHAR(100),
+    city VARCHAR(100),
+    phone VARCHAR(20)
+);
+..................
+CREATE TABLE DOCTOR (
+    doctorno INT PRIMARY KEY,
+    dname VARCHAR(100),
+    specialization VARCHAR(100)
+);
+....................
+CREATE TABLE WARD (
+    wardno INT PRIMARY KEY,
+    wardname VARCHAR(100),
+    city VARCHAR(100)
+);
+.................
+CREATE TABLE APPOINTMENT (
+    appointmentno INT PRIMARY KEY,
+    appointment_date DATE,
+    patientno INT,
+    doctorno INT,
+    FOREIGN KEY (patientno)
+        REFERENCES PATIENT(patientno),
+    FOREIGN KEY (doctorno)
+        REFERENCES DOCTOR(doctorno)
+);
+.....................
+  CREATE TABLE ADMISSION (
+    admissionno INT PRIMARY KEY,
+    patientno INT,
+    wardno INT,
+    admission_date DATE,
+    discharge_date DATE,
+    FOREIGN KEY (patientno)
+        REFERENCES PATIENT(patientno),
+    FOREIGN KEY (wardno)
+        REFERENCES WARD(wardno)
+);  
+.............
+ CREATE TABLE TREATMENT (
+    treatmentno INT PRIMARY KEY,
+    appointmentno INT,
+    description VARCHAR(255),
+    cost INT,
+    FOREIGN KEY (appointmentno)
+        REFERENCES APPOINTMENT(appointmentno)
+);
+...................
 
-ALTER TABLE OWNS
-ADD FOREIGN KEY (regno)
-REFERENCES CAR(regno);
+ (v)
+  SHOW TABLES;
+....
+DESC PATIENT;
+....
+ DESC DOCTOR;
+....
+ DESC WARD;
+....
+ DESC APPOINTMENT;
+.....
+ DESC ADMISSION;
+....
+ DESC TREATMENT;
 
-ALTER TABLE PARTICIPATED
-ADD FOREIGN KEY (driver_id, regno)
-REFERENCES OWNS(driver_id, regno);
-
-ALTER TABLE PARTICIPATED
-ADD FOREIGN KEY (report_number)
-REFERENCES ACCIDENT(report_number);
-
--- Q1 (iv)
-DESC PERSON;
-DESC CAR;
-DESC ACCIDENT;
-DESC OWNS;
-DESC PARTICIPATED;
-
--- Q1 (v)
-INSERT INTO PERSON VALUES
-('1', 'Ananth', 'Kandy'),
-('2', 'Bala', 'Batticaloa'),
-('3', 'Carol', 'Mannar');
-
-INSERT INTO CAR VALUES
-('1001', 'BMW', '2010-01-12'),
-('1002', 'BENZ', '2008-03-12'),
-('1003', 'BENZ', '2008-06-14');
-
-INSERT INTO ACCIDENT VALUES
-(1111, '2011-01-12', 'Kandy'),
-(2222, '2011-03-12', 'Batticaloa'),
-(3333, '2011-03-12', 'Batticaloa'),
-(4444, '2008-01-12', 'Kandy');
-
-INSERT INTO OWNS VALUES
-('1', '1001'),
-('2', '1002'),
-('3', '1003');
-
-INSERT INTO PARTICIPATED VALUES
-('1', '1001', 1111, 20000),
-('2', '1002', 2222, 40000),
-('3', '1003', 3333, 20000);
-
--- Q1 (vi)
-UPDATE PARTICIPATED
-SET damage_amount = 25000
-WHERE regno = '1002'
-AND report_number = 2222;
-
--- Q1 (vii)
-SELECT COUNT(DISTINCT model)
-FROM CAR;
-
--- Q1 (viii)
-SELECT COUNT(*)
-FROM ACCIDENT
-WHERE location = 'Batticaloa'
-AND YEAR(accdate) = 2011;
-
--- Q1 (ix)
-SELECT COUNT(DISTINCT O.driver_id)
-FROM OWNS O
-JOIN PARTICIPATED P
-ON O.driver_id = P.driver_id
-AND O.regno = P.regno
-JOIN ACCIDENT A
-ON P.report_number = A.report_number
-WHERE YEAR(A.accdate) = 2011;
-
--- Q1 (x)
-SELECT COUNT(DISTINCT P.report_number)
-FROM CAR C
-JOIN PARTICIPATED P
-ON C.regno = P.regno
-WHERE C.model = 'BMW';
-
--- Q1 (xi)
--- Run in Windows Command Prompt, not MySQL console:
--- mysqldump -u root -p insurance_db > insurance_db.sql
+...................................
+ (vii)
+ UPDATE PATIENT
+SET pname = 'Roshan'
+WHERE patientno = 101;
+.............................
+ (viii)
+ SELECT *
+FROM PATIENT
+WHERE city = 'Batticaloa';
+...............................
+ (ix)
+ SELECT *
+FROM PATIENT
+WHERE city = 'Batticaloa'
+   OR city = 'Jaffna';
+..................................
+ (x)
+ SELECT *
+FROM TREATMENT
+WHERE cost > 50000;
+....................................
+ (xi)
+ SELECT DISTINCT p.pname
+FROM PATIENT p
+INNER JOIN APPOINTMENT a
+    ON p.patientno = a.patientno
+INNER JOIN TREATMENT t
+    ON a.appointmentno = t.appointmentno
+WHERE t.cost > 50000;
+.....................................
+ (xii)
+ SELECT DISTINCT p.pname
+FROM PATIENT p
+INNER JOIN ADMISSION a
+    ON p.patientno = a.patientno
+INNER JOIN WARD w
+    ON a.wardno = w.wardno
+WHERE p.city = w.city;
+......................................
+ (xiii)
+ SELECT COUNT(*) AS total_wards
+FROM WARD
+WHERE city = 'Colombo';
+........................................
+ (xiv)
+ SELECT
+    CASE
+        WHEN COUNT(*) = 0 THEN 'YES'
+        ELSE 'NO'
+    END AS valid_dates
+FROM ADMISSION
+WHERE discharge_date < admission_date
+   OR discharge_date IS NULL
+   OR admission_date IS NULL;
+ 
+  
