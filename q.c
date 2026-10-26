@@ -1,4 +1,4 @@
--- Q1 (i)
+ -- Q1 (i)
 CREATE DATABASE IF NOT EXISTS insurance_db;
 USE insurance_db;
 
