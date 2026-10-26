@@ -1,312 +1,124 @@
-import javax.swing.*;
-import java.awt.*;
+-- Q1 (i)
+CREATE DATABASE IF NOT EXISTS insurance_db;
+USE insurance_db;
 
-public class HouseTransformation extends JPanel {
+-- Q1 (ii)
+CREATE TABLE PERSON (
+    driver_id VARCHAR(20) PRIMARY KEY,
+    name VARCHAR(50),
+    address VARCHAR(100)
+);
 
-    // DDA Line Drawing Algorithm
-    public void dda(Graphics g, int x0, int y0,
-                    int x1, int y1) {
+CREATE TABLE CAR (
+    regno VARCHAR(20) PRIMARY KEY,
+    model VARCHAR(50),
+    year DATE
+);
 
-        int dx = x1 - x0;
-        int dy = y1 - y0;
+CREATE TABLE ACCIDENT (
+    report_number INT PRIMARY KEY,
+    accdate DATE,
+    location VARCHAR(50)
+);
 
-        int steps = Math.max(Math.abs(dx), Math.abs(dy));
+CREATE TABLE OWNS (
+    driver_id VARCHAR(20),
+    regno VARCHAR(20),
+    PRIMARY KEY (driver_id, regno)
+);
 
-        if (steps == 0) {
-            g.fillRect(x0, y0, 1, 1);
-            return;
-        }
+CREATE TABLE PARTICIPATED (
+    driver_id VARCHAR(20),
+    regno VARCHAR(20),
+    report_number INT,
+    damage_amount INT,
+    PRIMARY KEY (driver_id, regno, report_number)
+);
 
-        float xInc = (float) dx / steps;
-        float yInc = (float) dy / steps;
+-- Q1 (iii)
+ALTER TABLE OWNS
+ADD FOREIGN KEY (driver_id)
+REFERENCES PERSON(driver_id);
 
-        float x = x0;
-        float y = y0;
+ALTER TABLE OWNS
+ADD FOREIGN KEY (regno)
+REFERENCES CAR(regno);
 
-        for (int i = 0; i <= steps; i++) {
-            g.fillRect(Math.round(x), Math.round(y), 1, 1);
-            x += xInc;
-            y += yInc;
-        }
-    }
+ALTER TABLE PARTICIPATED
+ADD FOREIGN KEY (driver_id, regno)
+REFERENCES OWNS(driver_id, regno);
 
-    // Translation
-    public void translate(int[][] xy, int tx, int ty) {
+ALTER TABLE PARTICIPATED
+ADD FOREIGN KEY (report_number)
+REFERENCES ACCIDENT(report_number);
 
-        for (int i = 0; i < xy.length; i++) {
-            xy[i][0] += tx;
-            xy[i][1] += ty;
-        }
-    }
+-- Q1 (iv)
+DESC PERSON;
+DESC CAR;
+DESC ACCIDENT;
+DESC OWNS;
+DESC PARTICIPATED;
 
-    // Scaling
-    public void scale(int[][] xy, double sx, double sy) {
+-- Q1 (v)
+INSERT INTO PERSON VALUES
+('1', 'Ananth', 'Kandy'),
+('2', 'Bala', 'Batticaloa'),
+('3', 'Carol', 'Mannar');
 
-        for (int i = 0; i < xy.length; i++) {
-            xy[i][0] = (int) Math.round(xy[i][0] * sx);
-            xy[i][1] = (int) Math.round(xy[i][1] * sy);
-        }
-    }
+INSERT INTO CAR VALUES
+('1001', 'BMW', '2010-01-12'),
+('1002', 'BENZ', '2008-03-12'),
+('1003', 'BENZ', '2008-06-14');
 
-    // Rotation
-    public void rotate(int[][] xy, double angle) {
+INSERT INTO ACCIDENT VALUES
+(1111, '2011-01-12', 'Kandy'),
+(2222, '2011-03-12', 'Batticaloa'),
+(3333, '2011-03-12', 'Batticaloa'),
+(4444, '2008-01-12', 'Kandy');
 
-        double rad = Math.toRadians(angle);
+INSERT INTO OWNS VALUES
+('1', '1001'),
+('2', '1002'),
+('3', '1003');
 
-        for (int i = 0; i < xy.length; i++) {
+INSERT INTO PARTICIPATED VALUES
+('1', '1001', 1111, 20000),
+('2', '1002', 2222, 40000),
+('3', '1003', 3333, 20000);
 
-            int x = xy[i][0];
-            int y = xy[i][1];
+-- Q1 (vi)
+UPDATE PARTICIPATED
+SET damage_amount = 25000
+WHERE regno = '1002'
+AND report_number = 2222;
 
-            xy[i][0] = (int) Math.round(
-                x * Math.cos(rad) - y * Math.sin(rad));
+-- Q1 (vii)
+SELECT COUNT(DISTINCT model)
+FROM CAR;
 
-            xy[i][1] = (int) Math.round(
-                x * Math.sin(rad) + y * Math.cos(rad));
-        }
-    }
+-- Q1 (viii)
+SELECT COUNT(*)
+FROM ACCIDENT
+WHERE location = 'Batticaloa'
+AND YEAR(accdate) = 2011;
 
-    // Draw Lines using DDA
-    public void drawLines(Graphics g, int[][] xy) {
+-- Q1 (ix)
+SELECT COUNT(DISTINCT O.driver_id)
+FROM OWNS O
+JOIN PARTICIPATED P
+ON O.driver_id = P.driver_id
+AND O.regno = P.regno
+JOIN ACCIDENT A
+ON P.report_number = A.report_number
+WHERE YEAR(A.accdate) = 2011;
 
-        for (int i = 0; i < xy.length - 1; i++) {
+-- Q1 (x)
+SELECT COUNT(DISTINCT P.report_number)
+FROM CAR C
+JOIN PARTICIPATED P
+ON C.regno = P.regno
+WHERE C.model = 'BMW';
 
-            dda(g, xy[i][0], xy[i][1],
-                   xy[i + 1][0], xy[i + 1][1]);
-        }
-    }
-
-    // Copy Coordinates
-    public int[][] copyPoints(int[][] xy) {
-
-        int[][] copy = new int[xy.length][2];
-
-        for (int i = 0; i < xy.length; i++) {
-            copy[i][0] = xy[i][0];
-            copy[i][1] = xy[i][1];
-        }
-
-        return copy;
-    }
-
-    // Transform and Draw One House
-    public void drawHouse(Graphics g,
-                          int[][] body,
-                          int[][] roof,
-                          int[][] door,
-                          int angle,
-                          int tx, int ty,
-                          Color color) {
-
-        int[][] b = copyPoints(body);
-        int[][] r = copyPoints(roof);
-        int[][] d = copyPoints(door);
-
-        // Scale 0.6
-        scale(b, 0.6, 0.6);
-        scale(r, 0.6, 0.6);
-        scale(d, 0.6, 0.6);
-
-        // Rotation
-        rotate(b, angle);
-        rotate(r, angle);
-        rotate(d, angle);
-
-        // Translation
-        translate(b, tx, ty);
-        translate(r, tx, ty);
-        translate(d, tx, ty);
-
-        // Draw House
-        g.setColor(color);
-
-        drawLines(g, b);
-        drawLines(g, r);
-        drawLines(g, d);
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-
-        // Original House Coordinates (Given)
-
-        // Body
-        int[][] body = {
-            {-100, 100},
-            {100, 100},
-            {100, 300},
-            {-100, 300},
-            {-100, 100}
-        };
-
-        // Roof
-        int[][] roof = {
-            {-100, 100},
-            {0, 0},
-            {100, 100},
-            {-100, 100}
-        };
-
-        // Door
-        int[][] door = {
-            {-30, 300},
-            {30, 300},
-            {30, 220},
-            {-30, 220},
-            {-30, 300}
-        };
-
-        // Top House - 0 Degree
-        drawHouse(g, body, roof, door,
-                  0, 400, 40, Color.RED);
-
-        // Right House - 90 Degree Clockwise
-        drawHouse(g, body, roof, door,
-                  90, 650, 350, Color.GREEN);
-
-        // Bottom House - 180 Degree
-        drawHouse(g, body, roof, door,
-                  180, 400, 650, Color.ORANGE);
-
-        // Left House - 270 Degree Clockwise
-        drawHouse(g, body, roof, door,
-                  270, 150, 350, Color.MAGENTA);
-    }
-
-    public static void main(String[] args) {
-
-        JFrame frame =
-            new JFrame("House Transformation");
-
-        frame.add(new HouseTransformation());
-
-        frame.setSize(800, 740);
-
-        frame.setDefaultCloseOperation(
-            JFrame.EXIT_ON_CLOSE);
-
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-    }
- }
-
-
- ******-------******-----****-----******-----***
-
- 
- public void dda(Graphics g, int x0, int y0, int x1, int y1) {
-    int dx = x1 - x0;
-    int dy = y1 - y0;
-    
-    // Find the number of steps required
-    int steps = Math.max(Math.abs(dx), Math.abs(dy));
-    
-    // Calculate increment in x and y for each step
-    float xInc = dx / (float) steps;
-    float yInc = dy / (float) steps;
-    
-    float x = x0;
-    float y = y0;
-    
-    for (int i = 0; i <= steps; i++) {
-        // Draw the pixel (using a small rectangle or fillRect)
-        g.fillRect(Math.round(x), Math.round(y), 1, 1);
-        x += xInc;
-        y += yInc;
-    }
- }
-
- .........................
- 
- public void BreCir(Graphics g, int xc, int yc, int r) {
-    int x = 0;
-    int y = r;
-    int p = 1 - r; // Initial decision parameter
-
-    drawSymmetricPoints(g, xc, yc, x, y);
-
-    while (x < y) {
-        x++;
-        if (p < 0) {
-            p += 2 * x + 1;
-        } else {
-            y--;
-            p += 2 * (x - y) + 1;
-        }
-        drawSymmetricPoints(g, xc, yc, x, y);
-    }
-}
-
-// Helper method to plot points in all 8 octants
-private void drawSymmetricPoints(Graphics g, int xc, int yc, int x, int y) {
-    g.fillRect(xc + x, yc + y, 1, 1);
-    g.fillRect(xc - x, yc + y, 1, 1);
-    g.fillRect(xc + x, yc - y, 1, 1);
-    g.fillRect(xc - x, yc - y, 1, 1);
-    g.fillRect(xc + y, yc + x, 1, 1);
-    g.fillRect(xc - y, yc + x, 1, 1);
-    g.fillRect(xc + y, yc - x, 1, 1);
-    g.fillRect(xc - y, yc - x, 1, 1);
- }
-
- .......................
-
- public void translate(int[][] xy, int tx, int ty) {
-    // xy is a 2D array where each row represents a point/vertex [x, y]
-    for (int i = 0; i < xy.length; i++) {
-        xy[i][0] += tx; // Translate x coordinate
-        xy[i][1] += ty; // Translate y coordinate
-    }
- }
-......................
-public void scale(int[][] xy, int sx, int sy) {
-    // Multiplying each vertex coordinate (x, y) by scaling factors sx and sy
-    for (int i = 0; i < xy.length; i++) {
-        xy[i][0] = (int) Math.round(xy[i][0] * sx);
-        xy[i][1] = (int) Math.round(xy[i][1] * sy);
-    }
- }
-.....................
- public void rotate(int[][] xy, double angle) {
-    // Convert angle from degrees to radians
-    double radians = Math.toRadians(angle);
-    double cos = Math.cos(radians);
-    double sin = Math.sin(radians);
-
-    for (int i = 0; i < xy.length; i++) {
-        double x = xy[i][0];
-        double y = xy[i][1];
-        
-        // Rotation about the origin formulas:
-        // x' = x * cos(theta) - y * sin(theta)
-        // y' = x * sin(theta) + y * cos(theta)
-        xy[i][0] = (int) Math.round(x * cos - y * sin);
-        xy[i][1] = (int) Math.round(x * sin + y * cos);
-    }
- }
-.........................
- public void rotate(Graphics g, float a[][2], int n, int x_pivot, int y_pivot, int angle)[span_5](start_span)[span_5](end_span) {
-    double rad = Math.toRadians(angle);
-    double cos = Math.cos(rad);
-    double sin = Math.sin(rad);
-    
-    int[] rotX = new int[n];
-    int[] rotY = new int[n];
-    
-    for (int i = 0; i < n; i++) {
-        float x = a[i][0];
-        float y = a[i][1];
-        
-        // Translate to origin, rotate, then translate back
-        double x_prime = x_pivot + (x - x_pivot) * cos - (y - y_pivot) * sin;
-        double y_prime = y_pivot + (x - x_pivot) * sin + (y - y_pivot) * cos;
-        
-        rotX[i] = (int) Math.round(x_prime);
-        rotY[i] = (int) Math.round(y_prime);
-    }
-    
-    g.drawPolygon(rotX, rotY, n);
- }
- 
- 
+-- Q1 (xi)
+-- Run in Windows Command Prompt, not MySQL console:
+-- mysqldump -u root -p insurance_db > insurance_db.sql
