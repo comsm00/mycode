@@ -1,130 +1,124 @@
- -- Q1 (i)
-CREATE DATABASE hospital_db;
+#include <iostream>
+#include <string>
+#include <iomanip>
+using namespace std;
 
--- Q1 (iii)
-USE hospital_db;
-.........
- CREATE TABLE PATIENT (
-    patientno INT PRIMARY KEY,
-    pname VARCHAR(100),
-    city VARCHAR(100),
-    phone VARCHAR(20)
-);
-..................
-CREATE TABLE DOCTOR (
-    doctorno INT PRIMARY KEY,
-    dname VARCHAR(100),
-    specialization VARCHAR(100)
-);
-....................
-CREATE TABLE WARD (
-    wardno INT PRIMARY KEY,
-    wardname VARCHAR(100),
-    city VARCHAR(100)
-);
-.................
-CREATE TABLE APPOINTMENT (
-    appointmentno INT PRIMARY KEY,
-    appointment_date DATE,
-    patientno INT,
-    doctorno INT,
-    FOREIGN KEY (patientno)
-        REFERENCES PATIENT(patientno),
-    FOREIGN KEY (doctorno)
-        REFERENCES DOCTOR(doctorno)
-);
-.....................
-  CREATE TABLE ADMISSION (
-    admissionno INT PRIMARY KEY,
-    patientno INT,
-    wardno INT,
-    admission_date DATE,
-    discharge_date DATE,
-    FOREIGN KEY (patientno)
-        REFERENCES PATIENT(patientno),
-    FOREIGN KEY (wardno)
-        REFERENCES WARD(wardno)
-);  
-.............
- CREATE TABLE TREATMENT (
-    treatmentno INT PRIMARY KEY,
-    appointmentno INT,
-    description VARCHAR(255),
-    cost INT,
-    FOREIGN KEY (appointmentno)
-        REFERENCES APPOINTMENT(appointmentno)
-);
-...................
+int main() {
+    string passengerName;
+    int passengerAge;
+    int numTickets;
+    int flightChoice;
+    int classChoice;
 
- (v)
-  SHOW TABLES;
-....
-DESC PATIENT;
-....
- DESC DOCTOR;
-....
- DESC WARD;
-....
- DESC APPOINTMENT;
-.....
- DESC ADMISSION;
-....
- DESC TREATMENT;
+    double economyFare = 0.0;
+    double pricePerTicket = 0.0;
+    double totalAmount = 0.0;
 
-...................................
- (vii)
- UPDATE PATIENT
-SET pname = 'Roshan'
-WHERE patientno = 101;
-.............................
- (viii)
- SELECT *
-FROM PATIENT
-WHERE city = 'Batticaloa';
-...............................
- (ix)
- SELECT *
-FROM PATIENT
-WHERE city = 'Batticaloa'
-   OR city = 'Jaffna';
-..................................
- (x)
- SELECT *
-FROM TREATMENT
-WHERE cost > 50000;
-....................................
- (xi)
- SELECT DISTINCT p.pname
-FROM PATIENT p
-INNER JOIN APPOINTMENT a
-    ON p.patientno = a.patientno
-INNER JOIN TREATMENT t
-    ON a.appointmentno = t.appointmentno
-WHERE t.cost > 50000;
-.....................................
- (xii)
- SELECT DISTINCT p.pname
-FROM PATIENT p
-INNER JOIN ADMISSION a
-    ON p.patientno = a.patientno
-INNER JOIN WARD w
-    ON a.wardno = w.wardno
-WHERE p.city = w.city;
-......................................
- (xiii)
- SELECT COUNT(*) AS total_wards
-FROM WARD
-WHERE city = 'Colombo';
-........................................
- (xiv)
- SELECT
-    CASE
-        WHEN COUNT(*) = 0 THEN 'YES'
-        ELSE 'NO'
-    END AS valid_dates
-FROM ADMISSION
-WHERE discharge_date < admission_date
-   OR discharge_date IS NULL
-   OR admission_date IS NULL;
- 
+    string flightName = "";
+    string className = "";
+
+    cout << "--- Air Ticket Reservation System ---\n";
+
+    cout << "Enter Passenger Name: ";
+    getline(cin, passengerName);
+
+    cout << "Enter Passenger Age: ";
+    cin >> passengerAge;
+
+    cout << "Enter Number of Tickets Required: ";
+    cin >> numTickets;
+
+    if (passengerAge <= 0 || numTickets <= 0) {
+        cout << "Invalid passenger age or ticket count!";
+        return 0;
+    }
+
+    cout << "\nSelect a Flight Option:\n";
+
+    cout << "1 - Colombo -> Chennai - Rs. 25000\n";
+    cout << "2 - Colombo -> Dubai - Rs. 85000\n";
+    cout << "3 - Colombo -> Singapore - Rs. 70000\n";
+    cout << "4 - Colombo -> London - Rs. 180000\n";
+
+    cout << "Enter your flight choice (1-4): ";
+    cin >> flightChoice;
+
+    switch (flightChoice) {
+
+        case 1:
+            flightName = "Colombo -> Chennai";
+            economyFare = 25000;
+            break;
+
+        case 2:
+            flightName = "Colombo -> Dubai";
+            economyFare = 85000;
+            break;
+
+        case 3:
+            flightName = "Colombo -> Singapore";
+            economyFare = 70000;
+            break;
+
+        case 4:
+            flightName = "Colombo -> London";
+            economyFare = 180000;
+            break;
+
+        default:
+            cout << "Invalid flight choice!";
+            return 0;
+    }
+
+    cout << "\nSelect Travel Class:\n";
+
+    cout << "1 - Economy Class\n";
+    cout << "2 - Business Class\n";
+
+    cout << "Enter your class choice (1-2): ";
+    cin >> classChoice;
+
+    if (classChoice == 1) {
+
+        className = "Economy Class";
+        pricePerTicket = economyFare;
+
+    }
+
+    else if (classChoice == 2) {
+
+        className = "Business Class";
+        pricePerTicket = economyFare * 1.75;
+
+    }
+
+    else {
+
+        cout << "Invalid travel class choice!";
+        return 0;
+
+    }
+
+    totalAmount = pricePerTicket * numTickets;
+
+    cout << fixed << setprecision(2);
+
+    cout << "\n====================================\n";
+
+    cout << "   TICKET RESERVED SUCCESSFULLY!\n";
+
+    cout << "====================================\n";
+
+    cout << "Passenger Name   : " << passengerName << endl;
+    cout << "Passenger Age    : " << passengerAge << endl;
+    cout << "Selected Flight  : " << flightName << endl;
+    cout << "Travel Class     : " << className << endl;
+    cout << "Number of Tickets: " << numTickets << endl;
+    cout << "Price per Ticket : Rs. " << pricePerTicket << endl;
+    cout << "Total Amount     : Rs. " << totalAmount << endl;
+
+    cout << "====================================\n";
+
+    return 0;
+}
   
